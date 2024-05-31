@@ -10,7 +10,7 @@ void RenderButtonFrame(int x, int y, int w, int h, SDL_Color color)
 
 SDL_Texture* LoadBoardTexture()
 {
-	SDL_Surface* BoardSurface = IMG_Load("Board4.jpg");
+	SDL_Surface* BoardSurface = IMG_Load("22.jpeg");
 	SDL_Texture* BoardTexture = SDL_CreateTextureFromSurface(renderer, BoardSurface);
 
 	SDL_FreeSurface(BoardSurface);
@@ -21,14 +21,6 @@ void draw_Board(SDL_Texture* texture, int SCREEN_HEIGHT)
 {
 	SDL_Rect rect = { 0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT };
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
-}
-
-SDL_Texture* Load1BoardTexture()
-{
-	SDL_Surface* BoardSurface = IMG_Load("Board.jpg");
-	SDL_Texture* BoardTexture = SDL_CreateTextureFromSurface(renderer, BoardSurface);
-	SDL_FreeSurface(BoardSurface);
-	return BoardTexture;
 }
 
 void draw_BackGround(SDL_Texture* texture, int x, int y, int w, int h)

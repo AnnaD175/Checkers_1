@@ -15,6 +15,7 @@ enum CheckerType {
 
 struct Cell {
 	CheckerType type;
+	bool king;
 };
 
 
@@ -22,6 +23,11 @@ extern Cell board[BOARD_SIZE][BOARD_SIZE];
 
 
 void InitializeBoard();
-void drawCheckers(SDL_Renderer* renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT);
+void DrawBoard(SDL_Renderer* renderer, int SCREEN_HEIGHT);
+void drawCheckers(SDL_Renderer* renderer, int SCREEN_HEIGHT, int selectedX, int selectedY,  bool possibleMoves[BOARD_SIZE][BOARD_SIZE]);
+bool IsValidMove(int startX, int startY, int endX, int endY, CheckerType currentPlayer);
+void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue);
+void GetPossibleMoves(int startX, int startY, bool possibleMoves[BOARD_SIZE][BOARD_SIZE], CheckerType currentPlayer);
+bool HasCaptureMoves(CheckerType currentPlayer);
 void loadmusic();
 int Game();

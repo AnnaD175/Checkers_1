@@ -288,6 +288,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
     SDL_Color black = { 0, 0, 0, 255 };
 
     int currentSelection = 0;
+	bool soundEnabled = true; //звук
 
     const char* menuItems[] =
     {
@@ -301,9 +302,11 @@ int ShowMainMenu(int* inGame, int* gameMode)
     int menuItemCount = sizeof(menuItems) / sizeof(menuItems[0]);
 
     int menuselection = -1;
+	loadmusic();
 
 	while (running)
 	{
+
 		int windowWidth, windowHeight;
 		SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
 
@@ -366,13 +369,23 @@ int ShowMainMenu(int* inGame, int* gameMode)
 					else if (currentSelection == 2)
 					{
 						menuselection = currentSelection;
-						Game();
-
+						if (*gameMode == 1) {
+							Game();
+						}
 					}
 					else if (currentSelection == 4)
 					{
 						// Переключение звука
+						soundEnabled = !soundEnabled;
 						menuItems[4] = (menuItems[4] == "Sound: ON") ? "Sound: OFF" : "Sound: ON";
+						if (soundEnabled)
+						{
+							loadmusic();
+						}
+						else if (!soundEnabled)
+						{
+							Mix_PauseMusic();
+						}
 					}
 					else if (currentSelection == 5)
 					{
@@ -421,7 +434,16 @@ int ShowMainMenu(int* inGame, int* gameMode)
 					else if (currentSelection == 4)
 					{
 						// Переключение звука
+						soundEnabled = !soundEnabled;
 						menuItems[4] = (menuItems[4] == "Sound: ON") ? "Sound: OFF" : "Sound: ON";
+						if (soundEnabled)
+						{
+							loadmusic();
+						}
+						else if (!soundEnabled)
+						{
+							Mix_PauseMusic();
+						}
 					}
 					else if (currentSelection == 5)
 					{
@@ -441,6 +463,9 @@ int ShowMainMenu(int* inGame, int* gameMode)
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_RenderClear(renderer);
 
+
+
+
 		//draw_BackGround(BackgroundTexture, 0, 0, windowWidth, windowHeight);
 		RenderText("Checkers", checkersdX, checkersdY, Titlefont, black);
 
@@ -456,6 +481,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
 
 		SDL_RenderPresent(renderer);
 	}
+
 	TTF_CloseFont(font);
 	return running;
 }
