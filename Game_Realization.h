@@ -32,4 +32,5 @@ void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue);
 void GetPossibleMoves(int startX, int startY, bool possibleMoves[BOARD_SIZE][BOARD_SIZE], CheckerType currentPlayer);
 bool HasCaptureMoves(CheckerType currentPlayer);
 void loadmusic();
+void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int title3Y, int title3Width, int title3Height, int* running);
 int Game();

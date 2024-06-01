@@ -221,6 +221,23 @@ void loadmusic()
 	Mix_PlayMusic(fon, -1);
 }
 
+
+void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int title3Y, int title3Width, int title3Height, int *running)
+{
+	if (xMenu>=(title1X-10) && xMenu<=(title1X+title3Width+20) && yMenu>=(title1Y-10) && yMenu<=(title1Y+ title3Height+20))
+	{
+		Game();
+	}
+	if (xMenu >= (title1X - 10) && xMenu <= (title1X + title3Width + 20) && yMenu >= (title2Y - 10) && yMenu <= (title2Y + title3Height + 20))
+	{
+		
+	}
+	if (xMenu >= (title1X - 10) && xMenu <= (title1X + title3Width + 20) && yMenu >= (title3Y - 10) && yMenu <= (title3Y + title3Height + 20))
+	{
+		*running = 0;
+	}
+}
+
 int Game()
 {
 	SDL_Event event;
@@ -236,6 +253,7 @@ int Game()
 
 	SDL_Color black = { 0, 0, 0, 255 };
 	SDL_Color brown = { 139, 69, 19, 255 };
+	SDL_Color brown2 = { 210, 180, 140, 255 };
 	TTF_Font* font = TTF_OpenFont("Title2.ttf", 16);
 
 	while (running)
@@ -243,6 +261,24 @@ int Game()
 		// Получить размеры окна
 		int windowWidth, windowHeight;
 		SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
+
+		int title3Width, title3Height;
+		TTF_SizeText(font, "Finish the game", &title3Width, &title3Height);
+		int title3X = windowHeight + 30;
+		int title3Y = windowHeight - title3Height - 30;
+
+
+		int title2Width, title2Height;
+		TTF_SizeText(font, "Save the game", &title2Width, &title2Height);
+		int title2X = windowHeight + 30;
+		int title2Y = windowHeight - title3Height - title2Height - 60;
+
+		int title1Width, title1Height;
+		TTF_SizeText(font, "New game", &title1Width, &title1Height);
+		int title1X = windowHeight + 30;
+		int title1Y = windowHeight - title3Height - title2Height - title1Height - 90;
+
+
 
 		while (SDL_PollEvent(&event))
 		{
@@ -253,23 +289,16 @@ int Game()
 					for (int col = 0; col < BOARD_SIZE; col++)
 						board[row][col].king = false;
 			}
-			else if (event.type == SDL_KEYDOWN)
-			{
-				if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_ESCAPE)
-				{
-					running = 0; // Возврат в главное меню
-					for (int row = 0; row < BOARD_SIZE; row++)
-						for (int col = 0; col < BOARD_SIZE; col++)
-							board[row][col].king = false;
-				}
-			}
+
 			else if (event.type == SDL_MOUSEBUTTONDOWN)
 			{
 				if (event.button.button == SDL_BUTTON_LEFT)
 				{
 					//running = 0; // Возврат в главное меню при клике
-					//int x = event.button.x;
-					//int y = event.button.y;
+					int xMenu = event.button.x;
+					int yMenu = event.button.y;
+
+					GameMenu(xMenu, yMenu, title1X, title1Y, title2Y, title3Y, title3Width, title3Height, &running);
 
 					int x = event.button.x / (windowHeight / BOARD_SIZE);
 					int y = event.button.y / (windowHeight / BOARD_SIZE);
@@ -373,15 +402,28 @@ int Game()
 		if (currentPlayer == BLACK) {
 			TTF_SizeText(font, "Move: black", &titleWidth, &titleHeight);
 		}
-		int titleX = (windowWidth - titleWidth-20);
+		int titleX = windowHeight + 30;
 		int titleY = 30;
 		if (currentPlayer == WHITE) {
-			RenderText("Move: white", titleX, titleY, font, black);
+			RenderText("Move: white", titleX, titleY, font, brown);
 		}
 		if (currentPlayer == BLACK) {
-			RenderText("Move: black", titleX, titleY, font, black);
+			RenderText("Move: black", titleX, titleY, font, brown);
 		}
-		RenderButtonFrame(titleX - 10, titleY - 10, titleWidth + 20, titleHeight + 20, brown);
+		RenderButtonFrame(titleX - 10, titleY - 10, titleWidth + 20, titleHeight + 20, brown2);
+
+
+
+		RenderText("Finish the game", title3X, title3Y, font, black);
+
+		RenderText("Save the game", title2X, title2Y, font, black);
+
+
+		RenderText("New game", title1X, title1Y, font, black);
+
+		RenderButtonFrame(title1X - 10, title1Y - 10, title3Width + 20, title3Height + 20, brown);
+		RenderButtonFrame(title2X - 10, title2Y - 10, title3Width + 20, title3Height + 20, brown);
+		RenderButtonFrame(title3X - 10, title3Y - 10, title3Width + 20, title3Height + 20, brown);
 
 		DrawBoard(renderer, windowHeight);
 		//draw_Board(BoardTexture, windowHeight);
