@@ -1,6 +1,160 @@
 #include "Menu.h"
 
-
+//int ShowGameMenu(int* gameMode)
+//{
+//	SDL_Event event;
+//	int running = 1;
+//
+//	TTF_Font* Titlefont = TTF_OpenFont("Title2.ttf", 40);
+//	TTF_Font* font = TTF_OpenFont("Title2.ttf", 24);
+//
+//
+//	SDL_Color brown = { 139, 69, 19, 255 };
+//	SDL_Color brown2 = { 210, 180, 140, 255 };
+//	SDL_Color white = { 255, 255, 255, 255 };
+//	SDL_Color black = { 0, 0, 0, 255 };
+//
+//	int currentSelection = 0;
+//	const char* GameMenu[] =
+//	{
+//		"New Game",
+//		"Save the game",
+//		"Finish the game",
+//	};
+//	int GameMenuCount = sizeof(GameMenu) / sizeof(GameMenu[0]);
+//
+//	while (running)
+//	{
+//		// Получить размеры окна
+//		int windowWidth, windowHeight;
+//		SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
+//
+//		// Определение размеров текста
+//		int totalHeight = 0;
+//		int textWidth = 0;
+//		int maxWidth = 0;
+//		for (int i = 0; i < GameMenuCount; i++)
+//		{
+//			int width, height;
+//			TTF_SizeText(font, GameMenu[i], &width, &height);
+//			totalHeight += height + 10;
+//			if (width > maxWidth)
+//			{
+//				maxWidth = width;
+//			}
+//		}
+//		totalHeight -= 10; // Убираем последний отступ
+//
+//		// Координаты для центрирования
+//		int startX = (windowWidth - maxWidth)*(0.8);
+//		int startY = (windowHeight - totalHeight) * (0.8);
+//
+//		while (SDL_PollEvent(&event))
+//		{
+//			if (event.type == SDL_QUIT)
+//			{
+//				running = 0;
+//				*gameMode = -1; // Выход из игры
+//			}
+//			else if (event.type == SDL_KEYDOWN)
+//			{
+//				switch (event.key.keysym.sym)
+//				{
+//				case SDLK_UP:
+//					currentSelection = (currentSelection - 1 + GameMenuCount) % GameMenuCount;
+//					break;
+//				case SDLK_DOWN:
+//					currentSelection = (currentSelection + 1) % GameMenuCount;
+//					break;
+//				case SDLK_RETURN:
+//					if (currentSelection == 0)
+//					{
+//						//*gameMode = 1;
+//						running = 0;
+//						Game();
+//					}
+//					else if (currentSelection == 1)
+//					{
+//						//*gameMode = 2;
+//						//running = 0;
+//					}
+//					else if (currentSelection == 2)
+//					{
+//						*gameMode = 0; // Назад в меню
+//						running = 0;
+//					}
+//					break;
+//				}
+//			}
+//			else if (event.type == SDL_MOUSEMOTION)
+//			{
+//				int mouseX = event.motion.x;
+//				int mouseY = event.motion.y;
+//				int y = startY;
+//				for (int i = 0; i < GameMenuCount; i++)
+//				{
+//					int width, height;
+//					TTF_SizeText(font, GameMenu[i], &width, &height);
+//					if (mouseX >= startX && mouseX <= startX + width && mouseY >= y && mouseY <= y + height)
+//					{
+//						currentSelection = i;
+//					}
+//					y += height + 10;
+//				}
+//			}
+//			else if (event.type == SDL_MOUSEBUTTONDOWN)
+//			{
+//				if (event.button.button == SDL_BUTTON_LEFT)
+//				{
+//					if (currentSelection == 0)
+//					{
+//						*gameMode = 1; // Классический режим
+//						running = 0;
+//						Game();
+//					}
+//					else if (currentSelection == 1)
+//					{
+//						//*gameMode = 2; // Режим на время
+//						//running = 0;
+//					}
+//					else if (currentSelection == 2)
+//					{
+//						*gameMode = 0; // Назад в меню
+//						running = 0;
+//					}
+//				}
+//			}
+//		}
+//
+//		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+//		SDL_RenderClear(renderer);
+//
+//
+//		// Отрисовка Menu
+//		int titleWidth, titleHeight;
+//		TTF_SizeText(font, "Menu", &titleWidth, &titleHeight);
+//		int titleX = (windowWidth - titleWidth -40);
+//		int titleY = windowHeight-200;
+//		RenderText("Menu", titleX, titleY, Titlefont, black);
+//
+//		int y = startY;
+//		for (int i = 0; i < GameMenuCount; i++)
+//		{
+//			int width, height;
+//			TTF_SizeText(font, GameMenu[i], &width, &height);
+//			RenderText(GameMenu[i], startX, y, font, (i == currentSelection) ? brown2 : brown);
+//			y += height + 10;
+//		}
+//		RenderButtonFrame(startX - 20, startY - 10, maxWidth + 40, totalHeight + 20, black);
+//
+//
+//		SDL_RenderPresent(renderer);
+//	}
+//
+//	TTF_CloseFont(font);
+//
+//	return *gameMode;
+//}
 
 // Функция для показа правил игры
 int ShowGameRulesMenu()
@@ -355,7 +509,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
 					if (currentSelection == 0)
 					{
 						ShowGameRulesMenu();
-						//*inGame = 1;
+						*inGame = 1;
 						//running = 0;
 					}
 					else if (currentSelection == 1)
@@ -371,6 +525,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
 						menuselection = currentSelection;
 						if (*gameMode == 1) {
 							Game();
+							//ShowGameMenu(gameMode);
 						}
 					}
 					else if (currentSelection == 4)

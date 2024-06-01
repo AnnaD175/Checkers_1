@@ -2,6 +2,8 @@
 
 #include "Init_DeInit.h"
 #include"Render.h"
+#include "Text.h"
+#include "Menu.h"
 
 
 #define BOARD_SIZE 8

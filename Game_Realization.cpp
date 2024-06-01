@@ -42,7 +42,7 @@ void drawCheckers(SDL_Renderer* renderer, int SCREEN_HEIGHT, int selectedX, int 
 	for (int row = 0; row < BOARD_SIZE; row++) {
 		for (int col = 0; col < BOARD_SIZE; col++) {
 			if (possibleMoves[row][col]) {
-				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Red for possible moves
+				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // blue for possible moves
 				SDL_Rect cell = { col * (SCREEN_HEIGHT / 8), row * (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8) };
 				SDL_RenderDrawRect(renderer, &cell);
 			}
@@ -234,6 +234,10 @@ int Game()
 	bool possibleMoves[BOARD_SIZE][BOARD_SIZE] = { false };
 	CheckerType currentPlayer = WHITE;
 
+	SDL_Color black = { 0, 0, 0, 255 };
+	SDL_Color brown = { 139, 69, 19, 255 };
+	TTF_Font* font = TTF_OpenFont("Title2.ttf", 16);
+
 	while (running)
 	{
 		// Получить размеры окна
@@ -288,14 +292,46 @@ int Game()
 
 								// Проверяем, есть ли еще возможные взятия
 								bool hasFurtherCapture = false;
-								for (int i = 0; i < BOARD_SIZE; ++i) {
-									for (int j = 0; j < BOARD_SIZE; ++j) {
-										if (possibleMoves[i][j] && abs(i - startY) == 2 && abs(j - startX) == 2) {
-											hasFurtherCapture = true;
+
+								if (board[startY][startX].king && mustContinue) {
+									int directions[4][2] = { {1, 1}, {1, -1}, {-1, 1}, {-1, -1} };
+									for (int d = 0; d < 4; ++d) {
+										int stepX = directions[d][0];
+										int stepY = directions[d][1];
+										int x = startX + stepX;
+										int y = startY + stepY;
+										bool opponentPieceFound = false;
+
+										while (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE) {
+											if (board[y][x].type != EMPTY) {
+												if (board[y][x].type == board[startY][startX].type || opponentPieceFound) {
+													break;
+												}
+												opponentPieceFound = true;
+											}
+											else if (opponentPieceFound && board[y][x].type == EMPTY) {
+												hasFurtherCapture = true;
+												break;
+											}
+											x += stepX;
+											y += stepY;
+										}
+
+										if (hasFurtherCapture) {
 											break;
 										}
 									}
-									if (hasFurtherCapture) break;
+								}
+								else if (!board[startY][startX].king){
+									for (int i = 0; i < BOARD_SIZE; ++i) {
+										for (int j = 0; j < BOARD_SIZE; ++j) {
+											if (possibleMoves[i][j] && abs(i - startY) == 2 && abs(j - startX) == 2) {
+												hasFurtherCapture = true;
+												break;
+											}
+										}
+										if (hasFurtherCapture) break;
+									}
 								}
 
 								if (!hasFurtherCapture) {
@@ -327,6 +363,25 @@ int Game()
 
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_RenderClear(renderer);
+
+
+		// Отрисовка Game Mode
+		int titleWidth, titleHeight;
+		if (currentPlayer == WHITE) {
+			TTF_SizeText(font, "Move: white", &titleWidth, &titleHeight);
+		}
+		if (currentPlayer == BLACK) {
+			TTF_SizeText(font, "Move: black", &titleWidth, &titleHeight);
+		}
+		int titleX = (windowWidth - titleWidth-20);
+		int titleY = 30;
+		if (currentPlayer == WHITE) {
+			RenderText("Move: white", titleX, titleY, font, black);
+		}
+		if (currentPlayer == BLACK) {
+			RenderText("Move: black", titleX, titleY, font, black);
+		}
+		RenderButtonFrame(titleX - 10, titleY - 10, titleWidth + 20, titleHeight + 20, brown);
 
 		DrawBoard(renderer, windowHeight);
 		//draw_Board(BoardTexture, windowHeight);
