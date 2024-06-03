@@ -400,7 +400,7 @@ int Game(int currentSelection)
 	int running = 1;
 	int piece_selected = 0;
 	int startX, startY;
-	if (currentSelection == 3) {
+	if (currentSelection == 2) {
 		InitializeBoard2();
 	}
 	else {
@@ -580,7 +580,7 @@ int Game(int currentSelection)
 		if (currentPlayer == BLACK) {
 			TTF_SizeText(font, "Move: black", &titleWidth, &titleHeight);
 		}
-		int titleX = windowHeight + 30;
+		int titleX = windowHeight +30;
 		int titleY = 30;
 		if (currentPlayer == WHITE) {
 			RenderText("Move: white", titleX, titleY, font, black);
