@@ -524,7 +524,15 @@ int ShowMainMenu(int* inGame, int* gameMode)
 					{
 						menuselection = currentSelection;
 						if (*gameMode == 1) {
-							Game();
+							Game(currentSelection);
+							//ShowGameMenu(gameMode);
+						}
+					}
+					else if (currentSelection == 3)
+					{
+						menuselection = currentSelection;
+						if (*gameMode == 1) {
+							Game(currentSelection);
 							//ShowGameMenu(gameMode);
 						}
 					}
@@ -644,6 +652,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
 
 void MainLoop()
 {
+	setlocale(LC_ALL, "Russian");
     SDL_Surface* icon = IMG_Load("2.png");
 
     if (icon != NULL)

@@ -1,6 +1,8 @@
 #include "Game_Realization.h"
 
+
 Cell board[BOARD_SIZE][BOARD_SIZE];
+Cell board1[BOARD_SIZE][BOARD_SIZE];
 
 void InitializeBoard()
 {
@@ -17,6 +19,94 @@ void InitializeBoard()
 			}
 		}
 	}
+}
+
+void InitializeBoard2()
+{
+	FILE* file1;
+
+	fopen_s(&file1, "OutputFile1.txt", "r");
+	if (file1==NULL) {
+		perror("Не удалось открыть файл");
+		return;
+	}
+
+	char str[50];
+
+	//Указатель, в который будет помещен адрес массива, в который считана 
+	// строка, или NULL если достигнут коней файла или произошла ошибка
+	char* estr;
+
+	// Открытие файла с режимом доступа «только чтение» и привязка к нему 
+	// потока данных
+	//printf("Открытие файла : ");
+	//file = fopen("test.txt", "r");
+
+	// Проверка открытия файла
+	//if (mf == NULL) { printf(“ошибка\n”); return -1; }
+	//else printf(“выполнено\n”);
+
+	//printf(“Считаны строки : \n”);
+
+	//Чтение (построчно) данных из файла в бесконечном цикле
+	while (1)
+	{
+		// Чтение одной строки  из файла
+		estr = fgets(str, sizeof(str), file1);
+
+		//Проверка на конец файла или ошибку чтения
+		if (estr == NULL)
+		{
+			// Проверяем, что именно произошло: кончился файл
+			// или это ошибка чтения
+			if (feof(file1) != 0)
+			{
+				//Если файл закончился, выводим сообщение о завершении 
+				//чтения и выходим из бесконечного цикла
+				printf("\nЧтение файла закончено\n");
+				break;
+			}
+			else
+			{
+				//Если при чтении произошла ошибка, выводим сообщение 
+				//об ошибке и выходим из бесконечного цикла
+				printf("\nОшибка чтения из файла\n");
+				break;
+			}
+		}
+		
+		int i, j, k, m;
+		char* context = NULL;
+		i=atoi(strtok_s(estr, "|", &context));
+		j = atoi(strtok_s(NULL, "|", &context));
+		k= atoi(strtok_s(NULL, "|", &context));
+		m = atoi(strtok_s(NULL, "|", &context));
+		if (k == 1)
+		{
+			board[i][j].type = BLACK;
+		}
+		else if (k == 2)
+		{
+			board[i][j].type = WHITE;
+		}
+		else if(k==0)
+		{
+			board[i][j].type = EMPTY;
+		}
+		if (m == 1)
+		{
+			board[i][j].king=true;
+		}
+		else if (m == 0)
+		{
+			board[i][j].king = false;
+		}
+
+		//printf(" % s", str);
+	}
+
+	fclose(file1);
+
 }
 
 void DrawBoard(SDL_Renderer* renderer, int SCREEN_HEIGHT) {
@@ -143,12 +233,12 @@ bool IsValidMove(int startX, int startY, int endX, int endY, CheckerType current
 	return false;
 }
 
-void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue) {
+void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue, CheckerType* currentPlayer, CheckerType* currentPlayer1) {
 	
 	int dx = endX - startX;
 	int dy = endY - startY;
 	*mustContinue = false;
-
+	CopyMas(currentPlayer1, currentPlayer);
 	// Проверка, было ли это взятие
 	if (abs(dx) == 2 && abs(dy) == 2) {
 		int middleX = startX + dx / 2;
@@ -221,16 +311,45 @@ void loadmusic()
 	Mix_PlayMusic(fon, -1);
 }
 
+void OutFail() {
+	FILE* file;
+	fopen_s(&file, "OutputFile1.txt", "w");
+	if (!file) {
+		perror("Не удалось открыть файл");
+		return;
+	}
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (board[i][j].king) {
+				fprintf(file, "%d|%d|%d|%d|\n", i, j, board[i][j].type, 1);
+			}
+			else {
+				fprintf(file, "%d|%d|%d|%d|\n", i, j, board[i][j].type, 0);
+			}
+			
+			
+			//const char* str;
+			//char str1[];
+			//sprintf(str1, sizeof(str1), "%d", i);
+			//str = ";" + i + ";" + j + ";" + board[i][j].type + ";" + board[i][j].king;
+			//printf("%s", str);
+		}
+			
+			
+	}
+	fclose(file);
+}
 
-void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int title3Y, int title3Width, int title3Height, int *running)
+void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int title3Y, int title3Width, int title3Height, int *running, int *d)
 {
 	if (xMenu>=(title1X-10) && xMenu<=(title1X+title3Width+20) && yMenu>=(title1Y-10) && yMenu<=(title1Y+ title3Height+20))
 	{
-		Game();
+		Game(2);
 	}
 	if (xMenu >= (title1X - 10) && xMenu <= (title1X + title3Width + 20) && yMenu >= (title2Y - 10) && yMenu <= (title2Y + title3Height + 20))
 	{
-		
+		OutFail();
+		*d = 2;
 	}
 	if (xMenu >= (title1X - 10) && xMenu <= (title1X + title3Width + 20) && yMenu >= (title3Y - 10) && yMenu <= (title3Y + title3Height + 20))
 	{
@@ -238,23 +357,76 @@ void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int t
 	}
 }
 
-int Game()
+void Bonus(int xMenu, int yMenu, int bonusX, int bonusY, int bonus2X, int bonus2Y, int bonusWidth, int bonusHeight, int bonus2Width, int bonus2Height, CheckerType* currentPlayer, CheckerType* currentPlayer1)
+{
+	if (xMenu >= bonusX && xMenu <= (bonusX + bonusWidth) && yMenu >= bonusY && yMenu <= (bonusY + bonusHeight))
+	{
+		CopyMasBack(currentPlayer, currentPlayer1);
+	}
+	if (xMenu >= bonus2X && xMenu <= (bonus2X + bonus2Width) && yMenu >= bonus2Y && yMenu <= (bonus2Y + bonus2Height))
+	{
+		if (*currentPlayer == WHITE)
+		{
+			*currentPlayer =BLACK;
+		}
+		else {
+			*currentPlayer = WHITE;
+		}
+	}
+}
+
+
+
+
+void CopyMas(CheckerType *currentPlayer1, CheckerType* currentPlayer)
+{
+
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			board1[i][j].type = board[i][j].type;
+			board1[i][j].king = board[i][j].king;
+		}
+	}
+	currentPlayer1 = currentPlayer;
+}
+
+void CopyMasBack(CheckerType* currentPlayer, CheckerType* currentPlayer1)
+{
+
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			board[i][j].type = board1[i][j].type;
+			board[i][j].king = board1[i][j].king;
+		}
+	}
+	currentPlayer = currentPlayer1;
+}
+
+
+int Game(int currentSelection)
 {
 	SDL_Event event;
 	int running = 1;
 	int piece_selected = 0;
 	int startX, startY;
-
-	InitializeBoard();
+	if (currentSelection == 3) {
+		InitializeBoard2();
+	}
+	else {
+		InitializeBoard();
+	}
 	SDL_Texture* BoardTexture = LoadBoardTexture();
 
 	bool possibleMoves[BOARD_SIZE][BOARD_SIZE] = { false };
 	CheckerType currentPlayer = WHITE;
+	CheckerType currentPlayer1 = WHITE;
 
 	SDL_Color black = { 0, 0, 0, 255 };
 	SDL_Color brown = { 139, 69, 19, 255 };
 	SDL_Color brown2 = { 210, 180, 140, 255 };
 	TTF_Font* font = TTF_OpenFont("Title2.ttf", 16);
+
+	int d=0;
 
 	while (running)
 	{
@@ -278,7 +450,15 @@ int Game()
 		int title1X = windowHeight + 30;
 		int title1Y = windowHeight - title3Height - title2Height - title1Height - 90;
 
+		int bonusWidth, bonusHeight;
+		TTF_SizeText(font, "Return", &bonusWidth, &bonusHeight);
+		int bonusX = windowHeight + 30;
+		int bonusY = windowHeight / 2-60;
 
+		int bonus2Width, bonus2Height;
+		TTF_SizeText(font, "+1 move", &bonus2Width, &bonus2Height);
+		int bonus2X = windowHeight + 30;
+		int bonus2Y = bonusY+ bonus2Height+30;
 
 		while (SDL_PollEvent(&event))
 		{
@@ -298,28 +478,35 @@ int Game()
 					int xMenu = event.button.x;
 					int yMenu = event.button.y;
 
-					GameMenu(xMenu, yMenu, title1X, title1Y, title2Y, title3Y, title3Width, title3Height, &running);
+
+					GameMenu(xMenu, yMenu, title1X, title1Y, title2Y, title3Y, title3Width, title3Height, &running, &d);
+					Bonus(xMenu, yMenu, bonusX, bonusY, bonus2X, bonus2Y, bonusWidth, bonusHeight, bonus2Width, bonus2Height, &currentPlayer, &currentPlayer1);
 
 					int x = event.button.x / (windowHeight / BOARD_SIZE);
 					int y = event.button.y / (windowHeight / BOARD_SIZE);
 
 					if (!piece_selected && board[y][x].type != EMPTY) {
+						d = 0;
+						CopyMas(&currentPlayer1, &currentPlayer);
 						startX = x;
 						startY = y;
 						piece_selected = true;
 						GetPossibleMoves(startX, startY, possibleMoves, currentPlayer);
 					}
 					else if (piece_selected) {
+						d = 0;
 						bool mustContinue = false;
 						if (IsValidMove(startX, startY, x, y, currentPlayer)) {
-							MovePiece(startX, startY, x, y, &mustContinue);
+							MovePiece(startX, startY, x, y, &mustContinue, &currentPlayer, &currentPlayer1);
 
 							if (mustContinue) {
+								CopyMas(&currentPlayer1, &currentPlayer);
 								startX = x;
 								startY = y;
 								GetPossibleMoves(startX, startY, possibleMoves, currentPlayer);
 
 								// Проверяем, есть ли еще возможные взятия
+								CopyMas(&currentPlayer1, &currentPlayer);
 								bool hasFurtherCapture = false;
 
 								if (board[startY][startX].king && mustContinue) {
@@ -405,25 +592,43 @@ int Game()
 		int titleX = windowHeight + 30;
 		int titleY = 30;
 		if (currentPlayer == WHITE) {
-			RenderText("Move: white", titleX, titleY, font, brown);
+			RenderText("Move: white", titleX, titleY, font, black);
 		}
 		if (currentPlayer == BLACK) {
-			RenderText("Move: black", titleX, titleY, font, brown);
+			RenderText("Move: black", titleX, titleY, font, black);
 		}
-		RenderButtonFrame(titleX - 10, titleY - 10, titleWidth + 20, titleHeight + 20, brown2);
+		RenderButtonFrame(titleX - 10, titleY - 10, titleWidth + 20, titleHeight + 20, brown);
+
+		RenderBack(windowWidth + (windowWidth - windowHeight) / 2, windowHeight / 2, windowWidth + (windowWidth - windowHeight) / 2 + (windowWidth - windowHeight) / 6 , windowHeight / 2+(windowWidth - windowHeight) / 6, brown);
+
+		//отрисовка бонусов
+		RenderText("Return", bonusX, bonusY, font, black);
+		RenderButtonFrame(bonusX - 10, bonusY - 10, bonus2Width + 20, bonusHeight + 20, brown);
+
+		RenderText("+1 move", bonus2X, bonus2Y, font, black);
+		RenderButtonFrame(bonus2X - 10, bonus2Y - 10, bonus2Width + 20, bonus2Height + 20, brown);
+
+		//отрисовка дополнительного меню
+		RenderText("Finish the game", title3X, title3Y, font, brown);
+		RenderText("New game", title1X, title1Y, font, brown);
+		if (d == 1)
+		{
+
+		}
+		if (d == 2)
+		{
+			RenderText("Save the game", title2X, title2Y, font, brown2);
+			
+		}
+		else {
+			RenderText("Save the game", title2X, title2Y, font, brown);
+		}
 
 
 
-		RenderText("Finish the game", title3X, title3Y, font, black);
-
-		RenderText("Save the game", title2X, title2Y, font, black);
-
-
-		RenderText("New game", title1X, title1Y, font, black);
-
-		RenderButtonFrame(title1X - 10, title1Y - 10, title3Width + 20, title3Height + 20, brown);
-		RenderButtonFrame(title2X - 10, title2Y - 10, title3Width + 20, title3Height + 20, brown);
-		RenderButtonFrame(title3X - 10, title3Y - 10, title3Width + 20, title3Height + 20, brown);
+		RenderButtonFrame(title1X - 10, title1Y - 10, title3Width + 20, title3Height + 20, black);
+		RenderButtonFrame(title2X - 10, title2Y - 10, title3Width + 20, title3Height + 20, black);
+		RenderButtonFrame(title3X - 10, title3Y - 10, title3Width + 20, title3Height + 20, black);
 
 		DrawBoard(renderer, windowHeight);
 		//draw_Board(BoardTexture, windowHeight);

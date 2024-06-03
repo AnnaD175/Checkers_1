@@ -8,6 +8,17 @@ void RenderButtonFrame(int x, int y, int w, int h, SDL_Color color)
 	SDL_RenderDrawRect(renderer, &rect);
 }
 
+void RenderBack(int x, int y, int w, int h, SDL_Color color)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_Rect rect = { x, y, w, h };
+	SDL_RenderDrawRect(renderer, &rect);
+	SDL_RenderDrawLine(renderer, x + w * (0.8), y + h * (0.2),x+ w * (0.6),y+ h * (0.6));
+	SDL_RenderDrawLine(renderer, x + w * (0.2), y + h * (0.8), x + w * (0.8), y + h * (0.8));
+	SDL_RenderDrawLine(renderer, x + w * (0.2), y + h * (0.8), x + w * (0.3), y + h * (0.7));
+	SDL_RenderDrawLine(renderer, x + w * (0.2), y + h * (0.8), x + w * (0.3), y + h * (0.7));
+}
+
 SDL_Texture* LoadBoardTexture()
 {
 	SDL_Surface* BoardSurface = IMG_Load("22.jpeg");
