@@ -37,16 +37,7 @@ void InitializeBoard2()
 	// строка, или NULL если достигнут коней файла или произошла ошибка
 	char* estr;
 
-	// ќткрытие файла с режимом доступа Ђтолько чтениеї и прив€зка к нему 
-	// потока данных
-	//printf("ќткрытие файла : ");
-	//file = fopen("test.txt", "r");
 
-	// ѕроверка открыти€ файла
-	//if (mf == NULL) { printf(Уошибка\nФ); return -1; }
-	//else printf(Увыполнено\nФ);
-
-	//printf(У—читаны строки : \nФ);
 
 	//„тение (построчно) данных из файла в бесконечном цикле
 	while (1)
@@ -611,10 +602,6 @@ int Game(int currentSelection)
 		//отрисовка дополнительного меню
 		RenderText("Finish the game", title3X, title3Y, font, brown);
 		RenderText("New game", title1X, title1Y, font, brown);
-		if (d == 1)
-		{
-
-		}
 		if (d == 2)
 		{
 			RenderText("Save the game", title2X, title2Y, font, brown2);

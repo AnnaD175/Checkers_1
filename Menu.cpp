@@ -447,7 +447,6 @@ int ShowMainMenu(int* inGame, int* gameMode)
     const char* menuItems[] =
     {
         "Rules",
-        "Select Game Mode",
         "Start New Game",
         "Saved Games",
         "Sound: ON",
@@ -514,10 +513,9 @@ int ShowMainMenu(int* inGame, int* gameMode)
 					}
 					else if (currentSelection == 1)
 					{
-						*gameMode = ShowGameModeMenu(gameMode);
-						if (*gameMode == -1)
-						{
-							running = 0;
+						menuselection = currentSelection;
+						if (*gameMode == 1) {
+							Game(currentSelection);
 						}
 					}
 					else if (currentSelection == 2)
@@ -525,18 +523,9 @@ int ShowMainMenu(int* inGame, int* gameMode)
 						menuselection = currentSelection;
 						if (*gameMode == 1) {
 							Game(currentSelection);
-							//ShowGameMenu(gameMode);
 						}
 					}
 					else if (currentSelection == 3)
-					{
-						menuselection = currentSelection;
-						if (*gameMode == 1) {
-							Game(currentSelection);
-							//ShowGameMenu(gameMode);
-						}
-					}
-					else if (currentSelection == 4)
 					{
 						// Переключение звука
 						soundEnabled = !soundEnabled;
@@ -550,7 +539,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
 							Mix_PauseMusic();
 						}
 					}
-					else if (currentSelection == 5)
+					else if (currentSelection == 4)
 					{
 						running = 0;
 					}
@@ -577,24 +566,26 @@ int ShowMainMenu(int* inGame, int* gameMode)
 			{
 				if (event.button.button == SDL_BUTTON_LEFT)
 				{
+
 					if (currentSelection == 0)
 					{
-						//*inGame = 1;
-						running = 0;
+						ShowGameRulesMenu();
 					}
 					else if (currentSelection == 1)
 					{
-						//*gameMode = ShowGameModeMenu(gameMode);
-						/*if (*gameMode == -1)
-						{
-							running = 0;
-						}*/
+						menuselection = currentSelection;
+						if (*gameMode == 1) {
+							Game(currentSelection);
+						}
 					}
 					else if (currentSelection == 2)
 					{
-						//ShowGameRulesMenu();
+						menuselection = currentSelection;
+						if (*gameMode == 1) {
+							Game(currentSelection);
+						}
 					}
-					else if (currentSelection == 4)
+					else if (currentSelection == 3)
 					{
 						// Переключение звука
 						soundEnabled = !soundEnabled;
@@ -608,7 +599,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
 							Mix_PauseMusic();
 						}
 					}
-					else if (currentSelection == 5)
+					else if (currentSelection == 4)
 					{
 						running = 0;
 					}
