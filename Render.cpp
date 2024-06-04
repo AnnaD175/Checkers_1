@@ -8,6 +8,13 @@ void RenderButtonFrame(int x, int y, int w, int h, SDL_Color color)
 	SDL_RenderDrawRect(renderer, &rect);
 }
 
+void RenderRect(int x, int y, int w, int h, SDL_Color color)
+{
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // white for possible moves
+	SDL_Rect Rect = {x, y, w, h };
+	SDL_RenderDrawRect(renderer, &Rect);
+}
+
 void RenderBack(int x, int y, int w, int h, SDL_Color color)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);

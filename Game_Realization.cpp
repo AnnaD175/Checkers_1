@@ -378,7 +378,7 @@ void CopyMas(CheckerType *currentPlayer1, CheckerType* currentPlayer)
 			board1[i][j].king = board[i][j].king;
 		}
 	}
-	currentPlayer1 = currentPlayer;
+	*currentPlayer1 = *currentPlayer;
 }
 
 void CopyMasBack(CheckerType* currentPlayer, CheckerType* currentPlayer1)
@@ -390,7 +390,7 @@ void CopyMasBack(CheckerType* currentPlayer, CheckerType* currentPlayer1)
 			board[i][j].king = board1[i][j].king;
 		}
 	}
-	currentPlayer = currentPlayer1;
+	*currentPlayer = *currentPlayer1;
 }
 
 
@@ -415,9 +415,11 @@ int Game(int currentSelection)
 	SDL_Color black = { 0, 0, 0, 255 };
 	SDL_Color brown = { 139, 69, 19, 255 };
 	SDL_Color brown2 = { 210, 180, 140, 255 };
+	SDL_Color white = { 255, 255, 255, 255 };
 	TTF_Font* font = TTF_OpenFont("Title2.ttf", 16);
 
 	int d=0;
+	int white_count=-1, black_count=-1;
 
 	while (running)
 	{
@@ -451,8 +453,14 @@ int Game(int currentSelection)
 		int bonus2X = windowHeight + 30;
 		int bonus2Y = bonusY+ bonus2Height+30;
 
+		// отрисовка завершения игры
+		int endWidth, endHeight;
+		int endX = windowHeight+30;
+		int endY = windowHeight / 4;
+
 		while (SDL_PollEvent(&event))
 		{
+
 			if (event.type == SDL_QUIT)
 			{
 				running = 0;
@@ -478,7 +486,7 @@ int Game(int currentSelection)
 
 					if (!piece_selected && board[y][x].type != EMPTY) {
 						d = 0;
-						CopyMas(&currentPlayer1, &currentPlayer);
+						//CopyMas(&currentPlayer1, &currentPlayer);
 						startX = x;
 						startY = y;
 						piece_selected = true;
@@ -491,13 +499,13 @@ int Game(int currentSelection)
 							MovePiece(startX, startY, x, y, &mustContinue, &currentPlayer, &currentPlayer1);
 
 							if (mustContinue) {
-								CopyMas(&currentPlayer1, &currentPlayer);
+								//CopyMas(&currentPlayer1, &currentPlayer);
 								startX = x;
 								startY = y;
 								GetPossibleMoves(startX, startY, possibleMoves, currentPlayer);
 
 								// Проверяем, есть ли еще возможные взятия
-								CopyMas(&currentPlayer1, &currentPlayer);
+								//CopyMas(&currentPlayer1, &currentPlayer);
 								bool hasFurtherCapture = false;
 
 								if (board[startY][startX].king && mustContinue) {
@@ -558,11 +566,39 @@ int Game(int currentSelection)
 							//currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE; // Переключение хода игрока
 						//}
 						//piece_selected = false;
+						//white_count = 0;
+						//black_count = 0;
 						for (int i = 0; i < BOARD_SIZE; ++i) {
 							for (int j = 0; j < BOARD_SIZE; ++j) {
 								possibleMoves[i][j] = false;
+								//if (board[y][x].type == WHITE)
+								//{
+								//	white_count=1;
+								//}
+								//if (board[y][x].type == BLACK)
+								//{
+								//	black_count = 1;
+								//}
+
 							}
 						}
+					}
+				}
+
+				white_count = 0;
+				black_count = 0;
+				for (int i = 0; i < BOARD_SIZE; ++i) {
+					for (int j = 0; j < BOARD_SIZE; ++j) {
+						//possibleMoves[i][j] = false;
+						if (board[i][j].type == WHITE)
+						{
+							white_count = 1;
+						}
+						if (board[i][j].type == BLACK)
+						{
+							black_count = 1;
+						}
+
 					}
 				}
 			}
@@ -610,6 +646,23 @@ int Game(int currentSelection)
 		else {
 			RenderText("Save the game", title2X, title2Y, font, brown);
 		}
+
+		if (white_count == 0) {
+			TTF_SizeText(font, "black wins!", &endWidth, &endHeight);
+			RenderRect(endX, endY, endWidth, endHeight, white);
+			RenderText("black wins!", endX, endY, font, black);
+		}
+		if (black_count == 0) {
+			TTF_SizeText(font, "white wins!", &endWidth, &endHeight);
+			RenderRect(endX, endY, endWidth, endHeight, white);
+			RenderText("white wins!", endX, endY, font, black);
+		}
+		//white_count = 0;
+		//black_count = 0;
+
+
+
+
 
 
 
