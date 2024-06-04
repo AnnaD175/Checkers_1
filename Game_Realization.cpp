@@ -4,6 +4,7 @@
 Cell board[BOARD_SIZE][BOARD_SIZE];
 Cell board1[BOARD_SIZE][BOARD_SIZE];
 
+//инициализация игровой доски
 void InitializeBoard()
 {
 	for (int i = 0; i < BOARD_SIZE; i++) {
@@ -21,6 +22,7 @@ void InitializeBoard()
 	}
 }
 
+//инициализация игровой доски сохраненной игры
 void InitializeBoard2()
 {
 	FILE* file1;
@@ -34,10 +36,8 @@ void InitializeBoard2()
 	char str[50];
 
 	//Указатель, в который будет помещен адрес массива, в который считана 
-	// строка, или NULL если достигнут коней файла или произошла ошибка
+	//строка, или NULL если достигнут конец файла или произошла ошибка
 	char* estr;
-
-
 
 	//Чтение (построчно) данных из файла в бесконечном цикле
 	while (1)
@@ -93,54 +93,53 @@ void InitializeBoard2()
 			board[i][j].king = false;
 		}
 
-		//printf(" % s", str);
 	}
 
 	fclose(file1);
 
 }
 
+//отрисовка игрового поля
 void DrawBoard(SDL_Renderer* renderer, int SCREEN_HEIGHT) {
-	for (int row = 0; row < BOARD_SIZE; row++) {
-		for (int col = 0; col < BOARD_SIZE; col++) {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
 			SDL_Color color;
-			if ((row + col) % 2 == 0)
-			{
+			if ((i + j) % 2 == 0) {
 				color = { 210, 180, 140, 255 };
 			}
 			else {
 				color = { 139, 69, 19, 255 };
 			}
 			SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-			//SDL_SetRenderDrawColor(renderer, (row + col) % 2 ? 139 : 210, 69, 19, 255); // Dark and light brown
-			SDL_Rect cell = { col * (SCREEN_HEIGHT/8), row * (SCREEN_HEIGHT/8), SCREEN_HEIGHT / 8, SCREEN_HEIGHT / 8 };
+			SDL_Rect cell = { j * (SCREEN_HEIGHT/8), i * (SCREEN_HEIGHT/8), SCREEN_HEIGHT / 8, SCREEN_HEIGHT / 8 };
 			SDL_RenderFillRect(renderer, &cell);
 		}
 	}
 }
 
+//отрисовка шашек
 void drawCheckers(SDL_Renderer* renderer, int SCREEN_HEIGHT, int selectedX, int selectedY,  bool possibleMoves[BOARD_SIZE][BOARD_SIZE]) {
-	for (int row = 0; row < BOARD_SIZE; row++) {
-		for (int col = 0; col < BOARD_SIZE; col++) {
-			if (possibleMoves[row][col]) {
-				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // blue for possible moves
-				SDL_Rect cell = { col * (SCREEN_HEIGHT / 8), row * (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8) };
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (possibleMoves[i][j]) {
+				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // голубой цвет для подсветки возможных ходов
+				SDL_Rect cell = { j * (SCREEN_HEIGHT / 8), i * (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8) };
 				SDL_RenderDrawRect(renderer, &cell);
 			}
 
-			if (board[row][col].type != EMPTY) {
+			if (board[i][j].type != EMPTY) {
 				SDL_Color color;
-				if (board[row][col].type == BLACK) {
+				if (board[i][j].type == BLACK) {
 					color = { 0, 0, 0, 255 }; // Черный цвет для шашек
 				}
-				else if (board[row][col].type == WHITE) {
+				else if (board[i][j].type == WHITE) {
 					color = { 255, 255, 255, 255 }; // Белый цвет для шашек
 				}
 
 				SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-				int centerX = col * (SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8) / 2;
-				int centerY = row * (SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8) / 2;
+				int centerX = j * (SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8) / 2;
+				int centerY = i * (SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8) / 2;
 				int radius = (SCREEN_HEIGHT / 8) / 2 - 5;
 
 				for (int w = 0; w < radius * 2; w++) {
@@ -152,16 +151,16 @@ void drawCheckers(SDL_Renderer* renderer, int SCREEN_HEIGHT, int selectedX, int 
 						}
 					}
 				}
-				if (board[row][col].king) {
-					SDL_SetRenderDrawColor(renderer, 255, 195, 0, 255); // Gold color for kings
+				if (board[i][j].king) {
+					SDL_SetRenderDrawColor(renderer, 255, 195, 0, 255); // желтый цвет для дамок
 					SDL_Rect kingRect = { centerX - 15, centerY - 15, 30, 30 };
 					SDL_RenderDrawRect(renderer, &kingRect);
 				}
 
-				// Highlight the selected piece
-				if (row == selectedY && col == selectedX) {
-					SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color for highlight
-					SDL_Rect highlightRect = { col * (SCREEN_HEIGHT / 8), row* (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8) };
+				// подсветка текущей шашки
+				if (i == selectedY && j == selectedX) {
+					SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // зеленый цвет для подсветки текущей шашки
+					SDL_Rect highlightRect = { j * (SCREEN_HEIGHT / 8), i* (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8) };
 					SDL_RenderDrawRect(renderer, &highlightRect);
 				}
 			}
@@ -197,7 +196,6 @@ bool IsValidMove(int startX, int startY, int endX, int endY, CheckerType current
 	}
 	else {
 		// Проверка хода для дамок
-	
 		if (abs(dx) == abs(dy)) {
 			int stepX = (dx > 0) ? 1 : -1;
 			int stepY = (dy > 0) ? 1 : -1;
@@ -224,12 +222,14 @@ bool IsValidMove(int startX, int startY, int endX, int endY, CheckerType current
 	return false;
 }
 
-void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue, CheckerType* currentPlayer, CheckerType* currentPlayer1) {
+//перемещение шашек
+void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue, CheckerType* currentPlayer, CheckerType* currentPlayer1, bool checker[BOARD_SIZE][BOARD_SIZE]) {
 	
 	int dx = endX - startX;
 	int dy = endY - startY;
-	*mustContinue = false;
+	*mustContinue = false;//продолжение хода
 	CopyMas(currentPlayer1, currentPlayer);
+
 	// Проверка, было ли это взятие
 	if (abs(dx) == 2 && abs(dy) == 2) {
 		int middleX = startX + dx / 2;
@@ -237,6 +237,7 @@ void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue, C
 		board[middleY][middleX].type = EMPTY;
 		board[middleY][middleX].king = false;
 		*mustContinue = true;
+		checker[endX][endY] = true;
 	}
 	else if (abs(dx) > 1 && abs(dy) > 1 && board[startY][startX].king) {
 		// Взятие для дамок
@@ -250,6 +251,7 @@ void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue, C
 				board[y][x].type = EMPTY;
 				board[y][x].king = false;
 				*mustContinue = true;
+				checker[endX][endY] = true;
 				break;
 			}
 			x += stepX;
@@ -269,6 +271,7 @@ void MovePiece(int startX, int startY, int endX, int endY, bool* mustContinue, C
 	}
 }
 
+//все возможные ходы для шашки
 void GetPossibleMoves(int startX, int startY, bool possibleMoves[BOARD_SIZE][BOARD_SIZE], CheckerType currentPlayer) {
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		for (int j = 0; j < BOARD_SIZE; ++j) {
@@ -277,6 +280,7 @@ void GetPossibleMoves(int startX, int startY, bool possibleMoves[BOARD_SIZE][BOA
 	}
 }
 
+//проверка возможности взятия шашки противника
 bool HasCaptureMoves(CheckerType currentPlayer) {
 	for (int y = 0; y < BOARD_SIZE; ++y) {
 		for (int x = 0; x < BOARD_SIZE; ++x) {
@@ -296,12 +300,14 @@ bool HasCaptureMoves(CheckerType currentPlayer) {
 	return false;
 }
 
+//фоновая музыка
 void loadmusic()
 {
 	fon = Mix_LoadMUS("Lobby-Time.mp3");
 	Mix_PlayMusic(fon, -1);
 }
 
+//запись в файл данных сохраненной игры
 void OutFail() {
 	FILE* file;
 	fopen_s(&file, "OutputFile1.txt", "w");
@@ -317,13 +323,6 @@ void OutFail() {
 			else {
 				fprintf(file, "%d|%d|%d|%d|\n", i, j, board[i][j].type, 0);
 			}
-			
-			
-			//const char* str;
-			//char str1[];
-			//sprintf(str1, sizeof(str1), "%d", i);
-			//str = ";" + i + ";" + j + ";" + board[i][j].type + ";" + board[i][j].king;
-			//printf("%s", str);
 		}
 			
 			
@@ -331,11 +330,12 @@ void OutFail() {
 	fclose(file);
 }
 
+//перемещение по дополнительному меню
 void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int title3Y, int title3Width, int title3Height, int *running, int *d)
 {
 	if (xMenu>=(title1X-10) && xMenu<=(title1X+title3Width+20) && yMenu>=(title1Y-10) && yMenu<=(title1Y+ title3Height+20))
 	{
-		Game(2);
+		Game(1);
 	}
 	if (xMenu >= (title1X - 10) && xMenu <= (title1X + title3Width + 20) && yMenu >= (title2Y - 10) && yMenu <= (title2Y + title3Height + 20))
 	{
@@ -348,6 +348,7 @@ void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int t
 	}
 }
 
+//нажатие кнопок бонусов
 void Bonus(int xMenu, int yMenu, int bonusX, int bonusY, int bonus2X, int bonus2Y, int bonusWidth, int bonusHeight, int bonus2Width, int bonus2Height, CheckerType* currentPlayer, CheckerType* currentPlayer1)
 {
 	if (xMenu >= bonusX && xMenu <= (bonusX + bonusWidth) && yMenu >= bonusY && yMenu <= (bonusY + bonusHeight))
@@ -366,9 +367,7 @@ void Bonus(int xMenu, int yMenu, int bonusX, int bonusY, int bonus2X, int bonus2
 	}
 }
 
-
-
-
+//копирование данных последнего хода в новый массив
 void CopyMas(CheckerType *currentPlayer1, CheckerType* currentPlayer)
 {
 
@@ -381,6 +380,7 @@ void CopyMas(CheckerType *currentPlayer1, CheckerType* currentPlayer)
 	*currentPlayer1 = *currentPlayer;
 }
 
+//возврат последнего хода
 void CopyMasBack(CheckerType* currentPlayer, CheckerType* currentPlayer1)
 {
 
@@ -393,6 +393,32 @@ void CopyMasBack(CheckerType* currentPlayer, CheckerType* currentPlayer1)
 	*currentPlayer = *currentPlayer1;
 }
 
+//обнуление массива дополнительного хода шашки
+void CheckerMasNull(bool checker[BOARD_SIZE][BOARD_SIZE])
+{
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			checker[i][j] = false;
+		}
+	}
+}
+
+//проверка выбранной шашки
+bool isChecker(int x, int y, bool checker[BOARD_SIZE][BOARD_SIZE])
+{    
+	bool z = true;
+
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (checker[i][j] == true)
+				if (i==x && j==y) { z = true; }
+				else { z = false; }
+			return z;
+		}
+	}
+	return z;
+}
+
 
 int Game(int currentSelection)
 {
@@ -400,23 +426,29 @@ int Game(int currentSelection)
 	int running = 1;
 	int piece_selected = 0;
 	int startX, startY;
+
+	//выбор игрового поля(новая игра/сохраненная игра)
 	if (currentSelection == 2) {
 		InitializeBoard2();
 	}
 	else {
 		InitializeBoard();
 	}
-	SDL_Texture* BoardTexture = LoadBoardTexture();
 
-	bool possibleMoves[BOARD_SIZE][BOARD_SIZE] = { false };
+	bool possibleMoves[BOARD_SIZE][BOARD_SIZE] = { false };//возможные ходы
+
 	CheckerType currentPlayer = WHITE;
 	CheckerType currentPlayer1 = WHITE;
+
+	bool checker[BOARD_SIZE][BOARD_SIZE];
+	CheckerMasNull(checker);
 
 	SDL_Color black = { 0, 0, 0, 255 };
 	SDL_Color brown = { 139, 69, 19, 255 };
 	SDL_Color brown2 = { 210, 180, 140, 255 };
 	SDL_Color white = { 255, 255, 255, 255 };
 	TTF_Font* font = TTF_OpenFont("Title2.ttf", 16);
+	TTF_Font* font1 = TTF_OpenFont("Title2.ttf", 23);
 
 	int d=0;
 	int white_count=-1, black_count=-1;
@@ -427,11 +459,11 @@ int Game(int currentSelection)
 		int windowWidth, windowHeight;
 		SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
 
+		//размеры кнопок дополнительного меню
 		int title3Width, title3Height;
 		TTF_SizeText(font, "Finish the game", &title3Width, &title3Height);
 		int title3X = windowHeight + 30;
 		int title3Y = windowHeight - title3Height - 30;
-
 
 		int title2Width, title2Height;
 		TTF_SizeText(font, "Save the game", &title2Width, &title2Height);
@@ -443,6 +475,7 @@ int Game(int currentSelection)
 		int title1X = windowHeight + 30;
 		int title1Y = windowHeight - title3Height - title2Height - title1Height - 90;
 
+		//размеры кнопок бонусов
 		int bonusWidth, bonusHeight;
 		TTF_SizeText(font, "Return", &bonusWidth, &bonusHeight);
 		int bonusX = windowHeight + 30;
@@ -464,16 +497,16 @@ int Game(int currentSelection)
 			if (event.type == SDL_QUIT)
 			{
 				running = 0;
-				for (int row = 0; row < BOARD_SIZE; row++)
-					for (int col = 0; col < BOARD_SIZE; col++)
-						board[row][col].king = false;
+				for (int i = 0; i < BOARD_SIZE; i++)
+					for (int j = 0; j < BOARD_SIZE; j++)
+						board[i][j].king = false;
 			}
 
 			else if (event.type == SDL_MOUSEBUTTONDOWN)
 			{
 				if (event.button.button == SDL_BUTTON_LEFT)
 				{
-					//running = 0; // Возврат в главное меню при клике
+
 					int xMenu = event.button.x;
 					int yMenu = event.button.y;
 
@@ -486,26 +519,30 @@ int Game(int currentSelection)
 
 					if (!piece_selected && board[y][x].type != EMPTY) {
 						d = 0;
-						//CopyMas(&currentPlayer1, &currentPlayer);
+
 						startX = x;
 						startY = y;
 						piece_selected = true;
+
 						GetPossibleMoves(startX, startY, possibleMoves, currentPlayer);
+
 					}
 					else if (piece_selected) {
 						d = 0;
 						bool mustContinue = false;
+						//CheckerMasNull(checker);
 						if (IsValidMove(startX, startY, x, y, currentPlayer)) {
-							MovePiece(startX, startY, x, y, &mustContinue, &currentPlayer, &currentPlayer1);
+							MovePiece(startX, startY, x, y, &mustContinue, &currentPlayer, &currentPlayer1, checker);
 
-							if (mustContinue) {
-								//CopyMas(&currentPlayer1, &currentPlayer);
+							if (mustContinue) //&& isChecker(x, y, checker)) {
+							{
+
+								if (!isChecker(x, y, checker)) { break; }
 								startX = x;
 								startY = y;
 								GetPossibleMoves(startX, startY, possibleMoves, currentPlayer);
 
 								// Проверяем, есть ли еще возможные взятия
-								//CopyMas(&currentPlayer1, &currentPlayer);
 								bool hasFurtherCapture = false;
 
 								if (board[startY][startX].king && mustContinue) {
@@ -552,33 +589,25 @@ int Game(int currentSelection)
 								if (!hasFurtherCapture) {
 									piece_selected = false;
 									currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
+									CheckerMasNull(checker);
+
 								}
 							}
 							else {
 								piece_selected = false;
 								currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
+								CheckerMasNull(checker);
+
 							}
 						}
 						else {
 							piece_selected = false;
 						}
 
-							//currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE; // Переключение хода игрока
-						//}
-						//piece_selected = false;
-						//white_count = 0;
-						//black_count = 0;
 						for (int i = 0; i < BOARD_SIZE; ++i) {
 							for (int j = 0; j < BOARD_SIZE; ++j) {
 								possibleMoves[i][j] = false;
-								//if (board[y][x].type == WHITE)
-								//{
-								//	white_count=1;
-								//}
-								//if (board[y][x].type == BLACK)
-								//{
-								//	black_count = 1;
-								//}
+
 
 							}
 						}
@@ -608,7 +637,7 @@ int Game(int currentSelection)
 		SDL_RenderClear(renderer);
 
 
-		// Отрисовка Game Mode
+		//отрисовка текущего хода
 		int titleWidth, titleHeight;
 		if (currentPlayer == WHITE) {
 			TTF_SizeText(font, "Move: white", &titleWidth, &titleHeight);
@@ -625,8 +654,6 @@ int Game(int currentSelection)
 			RenderText("Move: black", titleX, titleY, font, black);
 		}
 		RenderButtonFrame(titleX - 10, titleY - 10, titleWidth + 20, titleHeight + 20, brown);
-
-		RenderBack(windowWidth + (windowWidth - windowHeight) / 2, windowHeight / 2, windowWidth + (windowWidth - windowHeight) / 2 + (windowWidth - windowHeight) / 6 , windowHeight / 2+(windowWidth - windowHeight) / 6, brown);
 
 		//отрисовка бонусов
 		RenderText("Return", bonusX, bonusY, font, black);
@@ -646,32 +673,22 @@ int Game(int currentSelection)
 		else {
 			RenderText("Save the game", title2X, title2Y, font, brown);
 		}
-
-		if (white_count == 0) {
-			TTF_SizeText(font, "black wins!", &endWidth, &endHeight);
-			RenderRect(endX, endY, endWidth, endHeight, white);
-			RenderText("black wins!", endX, endY, font, black);
-		}
-		if (black_count == 0) {
-			TTF_SizeText(font, "white wins!", &endWidth, &endHeight);
-			RenderRect(endX, endY, endWidth, endHeight, white);
-			RenderText("white wins!", endX, endY, font, black);
-		}
-		//white_count = 0;
-		//black_count = 0;
-
-
-
-
-
-
-
 		RenderButtonFrame(title1X - 10, title1Y - 10, title3Width + 20, title3Height + 20, black);
 		RenderButtonFrame(title2X - 10, title2Y - 10, title3Width + 20, title3Height + 20, black);
 		RenderButtonFrame(title3X - 10, title3Y - 10, title3Width + 20, title3Height + 20, black);
 
+		//вывод на экран победившего игрока
+		if (white_count == 0) {
+			TTF_SizeText(font, "black wins!", &endWidth, &endHeight);
+			RenderText("black wins!", endX, endY, font1, black);
+		}
+		if (black_count == 0) {
+			TTF_SizeText(font, "white wins!", &endWidth, &endHeight);
+			RenderText("white wins!", endX, endY, font1, black);
+		}
+
+		//отрисовка доски и шашек
 		DrawBoard(renderer, windowHeight);
-		//draw_Board(BoardTexture, windowHeight);
 		drawCheckers(renderer, windowHeight, piece_selected ? startX : -1, piece_selected ? startY : -1, possibleMoves);
 
 

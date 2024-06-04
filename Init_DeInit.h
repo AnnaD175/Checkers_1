@@ -10,7 +10,7 @@
 #include <SDL_mixer.h>
 #include <string.h>
 #include <stdlib.h>
-#include<locale.h>
+#include <locale.h>
 
 extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
