@@ -8,7 +8,7 @@
 #include "Game_Realization.h"
 
 int ShowGameRulesMenu();
-int ShowMainMenu(int* inGame, int* gameMode);
+int ShowMainMenu(int* inGame);
 void MainLoop();
 
 

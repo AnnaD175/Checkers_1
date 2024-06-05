@@ -103,7 +103,7 @@ int ShowGameRulesMenu()
 }
 
 //главное меню
-int ShowMainMenu(int* inGame, int* gameMode)
+int ShowMainMenu(int* inGame)
 {
     SDL_Event event;
     int running = 1;
@@ -123,7 +123,7 @@ int ShowMainMenu(int* inGame, int* gameMode)
     {
         "Rules",
         "Start New Game",
-        "Saved Games",
+        "Saved Game",
         "Sound: ON",
         "Quit"
     };
@@ -188,16 +188,12 @@ int ShowMainMenu(int* inGame, int* gameMode)
 					else if (currentSelection == 1)
 					{
 						menuselection = currentSelection;
-						if (*gameMode == 1) {
-							Game(currentSelection);
-						}
+						Game(currentSelection);
 					}
 					else if (currentSelection == 2)
 					{
 						menuselection = currentSelection;
-						if (*gameMode == 1) {
-							Game(currentSelection);
-						}
+						Game(currentSelection);
 					}
 					else if (currentSelection == 3)
 					{
@@ -248,16 +244,12 @@ int ShowMainMenu(int* inGame, int* gameMode)
 					else if (currentSelection == 1)
 					{
 						menuselection = currentSelection;
-						if (*gameMode == 1) {
-							Game(currentSelection);
-						}
+						Game(currentSelection);
 					}
 					else if (currentSelection == 2)
 					{
 						menuselection = currentSelection;
-						if (*gameMode == 1) {
-							Game(currentSelection);
-						}
+						Game(currentSelection);
 					}
 					else if (currentSelection == 3)
 					{
@@ -335,7 +327,7 @@ void MainLoop()
     {
         if (!inGame)
         {
-            running = ShowMainMenu(&inGame, &gameMode);
+            running = ShowMainMenu(&inGame);
         }
         else
         {

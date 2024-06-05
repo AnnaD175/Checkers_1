@@ -25,10 +25,10 @@ void InitializeBoard()
 //инициализация игровой доски сохраненной игры
 void InitializeBoard2()
 {
-	FILE* file1;
+	FILE* file;
 
-	fopen_s(&file1, "OutputFile1.txt", "r");
-	if (file1==NULL) {
+	fopen_s(&file, "OutputFile1.txt", "r");
+	if (file==NULL) {
 		perror("Не удалось открыть файл");
 		return;
 	}
@@ -43,14 +43,14 @@ void InitializeBoard2()
 	while (1)
 	{
 		// Чтение одной строки  из файла
-		estr = fgets(str, sizeof(str), file1);
+		estr = fgets(str, sizeof(str), file);
 
 		//Проверка на конец файла или ошибку чтения
 		if (estr == NULL)
 		{
 			// Проверяем, что именно произошло: кончился файл
 			// или это ошибка чтения
-			if (feof(file1) != 0)
+			if (feof(file) != 0)
 			{
 				//Если файл закончился, выводим сообщение о завершении 
 				//чтения и выходим из бесконечного цикла
@@ -68,10 +68,10 @@ void InitializeBoard2()
 		
 		int i, j, k, m;
 		char* context = NULL;
-		i=atoi(strtok_s(estr, "|", &context));
-		j = atoi(strtok_s(NULL, "|", &context));
-		k= atoi(strtok_s(NULL, "|", &context));
-		m = atoi(strtok_s(NULL, "|", &context));
+		i=atoi(strtok_s(estr, "|", &context));//координата клетки по горизонтали
+		j = atoi(strtok_s(NULL, "|", &context));//координата клетки по вертикали
+		k= atoi(strtok_s(NULL, "|", &context));//цвет шашки (или пустая клетка)
+		m = atoi(strtok_s(NULL, "|", &context));//является ли дамкой
 		if (k == 1)
 		{
 			board[i][j].type = BLACK;
@@ -95,7 +95,7 @@ void InitializeBoard2()
 
 	}
 
-	fclose(file1);
+	fclose(file);
 
 }
 
@@ -122,7 +122,7 @@ void drawCheckers(SDL_Renderer* renderer, int SCREEN_HEIGHT, int selectedX, int 
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
 			if (possibleMoves[i][j]) {
-				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // голубой цвет для подсветки возможных ходов
+				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //синий цвет для подсветки возможных ходов
 				SDL_Rect cell = { j * (SCREEN_HEIGHT / 8), i * (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8), (SCREEN_HEIGHT / 8) };
 				SDL_RenderDrawRect(renderer, &cell);
 			}
@@ -335,6 +335,9 @@ void GameMenu(int xMenu, int yMenu, int title1X, int title1Y, int title2Y, int t
 {
 	if (xMenu>=(title1X-10) && xMenu<=(title1X+title3Width+20) && yMenu>=(title1Y-10) && yMenu<=(title1Y+ title3Height+20))
 	{
+		for (int i = 0; i < BOARD_SIZE; i++)
+			for (int j = 0; j < BOARD_SIZE; j++)
+				board[i][j].king = false;
 		Game(1);
 	}
 	if (xMenu >= (title1X - 10) && xMenu <= (title1X + title3Width + 20) && yMenu >= (title2Y - 10) && yMenu <= (title2Y + title3Height + 20))
